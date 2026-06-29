@@ -6,36 +6,47 @@ export class LoginPage {
     public readonly passwordInput: Locator;
     public readonly loginButton: Locator;
     public readonly errorMessage: Locator;
+    public readonly emailHelpMessage: Locator;
+    passwordToggleVisibilityButton: Locator;
+    public readonly forgotPasswordLink: Locator;
+    public readonly forgotPasswordConfirmButton: Locator;
+    public readonly signUpLink: Locator;
+    public readonly termsLink: Locator;
+    public readonly privacyLink: Locator;
+    public readonly learnMoreLink: Locator;
 
-   constructor(private readonly page: Page) {
+   constructor(public readonly page: Page) {
      
         this.emailInput = page.getByTestId('signin-email-input');
         this.passwordInput = page.getByTestId('signin-password-input');
         this.loginButton = page.getByTestId('signin-login-btn');
+        this.passwordToggleVisibilityButton = page.getByRole('img', { name: 'eye-invisible' });
+        this.errorMessage = page.locator('[role="alert"], .MuiAlert-message').first();
+        this.emailHelpMessage = page.locator('#email_help');
+        this.passwordToggleVisibilityButton = page.locator('.ant-input-password-icon');
+        this.forgotPasswordLink = page.locator('text=Forgot password?');
+        this.forgotPasswordConfirmButton = page.getByTestId('forgotten-password-confirm-btn');
+        this.signUpLink = page.locator('text=Sign Up');
+        this.termsLink = page.locator('text=Terms Of Service');
+        this.privacyLink = page.locator('text=Privacy Policy');
+        this.learnMoreLink = page.locator('text=Learn More');
         
-        // Univerzalni lokator za error toast/poruku (prilagodićemo ga ako bude potrebno)
-        this.errorMessage = page.locator('[role="alert"], .error-message, .MuiAlert-message');
+      
     }
 
-    /**
-     * Navigates directly to the login page
-     */
     async navigate(): Promise<void> {
-        await this.page.goto('https://reporting-qa.tabski.com');
+        await this.page.goto('/');
+        await this.page.waitForLoadState('networkidle');
     }
 
-    /**
-     * Encapsulates the complete login workflow (filling fields and clicking login)
-     */
+    
     async login(email: string, password: string): Promise<void> {
         await this.emailInput.fill(email);
         await this.passwordInput.fill(password);
         await this.loginButton.click();
     }
 
-    /**
-     * Simulates form submission using the Enter key from the password field
-     */
+    
     async loginWithEnterKey(email: string, password: string): Promise<void> {
         await this.emailInput.fill(email);
         await this.passwordInput.fill(password);
@@ -49,4 +60,7 @@ export class LoginPage {
         await this.emailInput.clear();
         await this.passwordInput.clear();
     }
-}
+async getErrorMessageText(): Promise<string> {
+        await this.errorMessage.waitFor({ state: 'visible', timeout: 5000 });
+        return await this.errorMessage.innerText();
+    }}
