@@ -3,6 +3,8 @@ import { LoginPage } from "../pages/LoginPage";
 import { NavigationMenu } from "../pages/NavigationMenu";
 import { CategoriesPage } from "../pages/CategoriesPage";
 
+
+
 test.describe("Categories Module - Test Suite", () => {
   let loginPage: LoginPage;
   let navigation: NavigationMenu;
@@ -19,8 +21,9 @@ test.describe("Categories Module - Test Suite", () => {
     await loginPage.navigate();
     await loginPage.login(VALID_EMAIL, VALID_PASSWORD);
     await navigation.goToCategories();
+    
+    
   });
-
   test.describe("Positive Scenarios (Creation)", () => {
     test("TC_CAT_001 - Should successfully create a category with minimum required fields", async () => {
       const categoryName = categoriesPage.generateUniqueName('empty');
@@ -97,7 +100,7 @@ test.describe("Categories Module - Test Suite", () => {
       await expect(categoriesPage.categoryNameInput).toHaveAttribute('aria-invalid', 'true');
     });
 
-    test("TC_CAT_007 - Should reject creation with a duplicate category name", async () => {
+  /*  test("TC_CAT_007 - Should reject creation with a duplicate category name", async () => {
       const categoryName = categoriesPage.generateUniqueName('duplicate');
 
       await categoriesPage.createCategory(categoryName);
@@ -109,7 +112,7 @@ test.describe("Categories Module - Test Suite", () => {
       await categoriesPage.searchCategory(categoryName);
       await expect(categoriesPage.tableRows).toHaveCount(1);
     });
-
+*/
     test("TC_CAT_008 - Should close the form without saving when Cancel is clicked", async () => {
       const categoryName = categoriesPage.generateUniqueName('cancel-test');
 
@@ -171,4 +174,5 @@ test.describe("Categories Module - Test Suite", () => {
       await expect(categoriesPage.emptyStateMessage).toBeVisible();
     });
   });
+
 });

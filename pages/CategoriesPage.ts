@@ -1,6 +1,9 @@
 import { Locator, Page, expect } from "@playwright/test";
 
 export class CategoriesPage {
+    static deleteAllMarijanaCategories() {
+      throw new Error("Method not implemented.");
+    }
     readonly page: Page;
 
     readonly createCategoryButton: Locator;
@@ -64,12 +67,7 @@ export class CategoriesPage {
         await this.categoryNameInput.fill(name);
     }
 
-    /**
-     * Selects a menu from the "Assign menus" dropdown.
-     * The Ant Design dropdown does not expose options via standard
-     * accessibility roles, so selection relies on blind-typing combined
-     * with explicit waits rather than role-based locators.
-     */
+  
     async assignMenu(menuName: string): Promise<void> {
         await this.assignMenusDropdown.scrollIntoViewIfNeeded();
         await this.assignMenusDropdown.click();
@@ -81,12 +79,7 @@ export class CategoriesPage {
         await this.page.keyboard.press('Escape');
     }
 
-    /**
-     * Selects one or more items from the "Assign items" dropdown.
-     * Same blind-typing approach as assignMenu, since the underlying
-     * Ant Design component does not expose selectable options for
-     * locator-based waiting.
-     */
+  
     async assignItems(items: string[]): Promise<void> {
         await this.assignItemsDropdown.click();
         await this.page.waitForTimeout(500);
@@ -132,6 +125,8 @@ export class CategoriesPage {
         }
 
         await this.submitForm();
+        await this.verifySuccessNotification("Successfully created");
+
     }
 
     
@@ -193,9 +188,10 @@ export class CategoriesPage {
             await this.page.waitForLoadState('networkidle'); 
         }
 
-
         await this.openCategoryOptions(name);
         await this.page.getByTestId('category-item-delete').click();
         await this.deleteConfirmButton.click();
     }
+  
 }
+

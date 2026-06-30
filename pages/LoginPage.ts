@@ -53,9 +53,7 @@ export class LoginPage {
         await this.passwordInput.press('Enter');
     }
 
-    /**
-     * Clears both credential fields
-     */
+    
     async clearFields(): Promise<void> {
         await this.emailInput.clear();
         await this.passwordInput.clear();
