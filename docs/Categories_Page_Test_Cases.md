@@ -5,7 +5,7 @@
 **Framework:** Playwright (TypeScript) – Page Object Model  
 **Environment:** `https://reporting-qa.tabski.com`  
 **Merchant:** Sushi Bistro  
-**Prepared by:** QA Engineer Marijana Nicic 
+**Prepared by:** QA Engineer Marijana Nicic
 **Last Updated:** June 2026  
 
 ---
