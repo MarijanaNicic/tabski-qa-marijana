@@ -97,7 +97,7 @@ test.describe("Login Page - Maximum Coverage Test Suite", () => {
     test("TC_LOG_011 - Should verify Footer Links opening in new tabs (Terms, Privacy Policy and Learn More)", async ({
       page,
     }) => {
-      // 1. Provera Terms & Conditions linka
+     
       const [termsPage] = await Promise.all([
         page.waitForEvent("popup"),
         loginPage.termsLink.click(),
@@ -107,7 +107,6 @@ test.describe("Login Page - Maximum Coverage Test Suite", () => {
       await expect(termsPage).toHaveURL("https://tabski.com/terms-of-service/");
       await termsPage.close();
 
-      // 2. Provera Privacy Policy linka
       const [privacyPage] = await Promise.all([
         page.waitForEvent("popup"),
         loginPage.privacyLink.click(),
@@ -116,7 +115,6 @@ test.describe("Login Page - Maximum Coverage Test Suite", () => {
       await expect(privacyPage).toHaveURL("https://tabski.com/privacy-policy/");
       await privacyPage.close();
 
-      // 3. Provera Learn More linka
       const [learnMorePage] = await Promise.all([
         page.waitForEvent("popup"),
         loginPage.learnMoreLink.click(),
@@ -271,7 +269,7 @@ test.describe("Login Page - Maximum Coverage Test Suite", () => {
         offline: false,
         downloadThroughput: (350 * 1024) / 8, // ~350 kbps
         uploadThroughput: (200 * 1024) / 8, // ~200 kbps
-        latency: 300, // 300ms kašnjenja
+        latency: 300, // 300ms 
       });
 
       await loginPage.navigate();
