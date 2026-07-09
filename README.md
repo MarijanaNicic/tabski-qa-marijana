@@ -11,11 +11,11 @@ This repository covers both parts of the technical assignment:
 
 ## Tech Stack
 
-| Tool | Purpose |
-|---|---|
+| Tool                                 | Purpose                          |
+| ------------------------------------ | -------------------------------- |
 | [Playwright](https://playwright.dev) | Browser automation & test runner |
-| TypeScript | Language |
-| Page Object Model | Test architecture pattern |
+| TypeScript                           | Language                         |
+| Page Object Model                    | Test architecture pattern        |
 
 ---
 
@@ -35,7 +35,8 @@ This repository covers both parts of the technical assignment:
 ├── tests/
 │   ├── login.spec.ts
 │   ├── categories.spec.ts
-│   └── items_integration.spec.ts
+│   ├── items_integration.spec.ts
+│   └── apiUtils.ts
 ├── playwright.config.ts
 ├── package.json
 └── README.md
@@ -108,7 +109,9 @@ npx playwright test --ui
 ```bash
 npx playwright show-report
 ```
+
 ### Test Execution Report
+
 <p align="center">
   <img src="docs/images/test-report.png" width="700" alt="Test Reports">
 </p>
@@ -139,6 +142,21 @@ Full test case documentation: [`docs/Items_Integration_Test_Cases.md`](./docs/It
 
 ---
 
+## Test Data Cleanup (`tests/apiUtils.ts`)
+
+Since all candidates share the same QA merchant account, `categories.spec.ts` creates several uniquely named test categories on every run (see `generateUniqueName()`). To keep the shared environment tidy, a `test.afterAll` hook in `categories.spec.ts` automatically removes every category created by this suite once all tests in the file have finished running.
+
+**How it works:**
+
+1. **Token extraction from the live session** – rather than storing a static API token (which would expire and require manual refreshing), the auth token is read directly from the browser's `localStorage` (`USER_ACCESS_TOKEN_REPORTING`) at the end of `beforeEach`, right after the UI login. This guarantees the cleanup step always uses a valid token belonging to the exact session Playwright just created, with no hardcoded secrets in the source code.
+2. **Fetching candidate categories** – `ApiUtils.getMarijanaCategories()` queries the `getCategories` GraphQL endpoint and filters for categories whose name contains `test-kategorija-marijana` (the prefix used by `generateUniqueName()`).
+3. **Unassigning items before delete** – the API rejects deletion of a category that still has menu items attached. `ApiUtils.unassignAllItems()` calls the `updateCategory` mutation with `deletedItemIds` set to the category's current item IDs, clearing it out first.
+4. **Deletion** – `ApiUtils.deleteCategoryById()` then calls the `deleteMenuCategory` mutation. Any category matched by the filter is removed, and a summary of successfully deleted (and, if any, failed) category names is printed to the console.
+
+This cleanup step runs automatically as part of `categories.spec.ts` — no separate command is needed. A `DRY RUN - preview cleanup` test is also included, which lists matching categories via `getMarijanaCategories()` without deleting anything, useful for manually verifying the filter before trusting the automatic cleanup.
+
+---
+
 ## Important Notes
 
 - **Shared test environment:** All candidates run tests against the same QA merchant account. Every category created by the suite uses a dynamically generated unique name via `generateUniqueName()` (pattern: `test-kategorija-marijana-[suffix]-[timestamp]`) to avoid collisions with other candidates' data.
@@ -153,6 +171,7 @@ Full test case documentation: [`docs/Items_Integration_Test_Cases.md`](./docs/It
 - **Category/menu dropdown interactions use blind keyboard typing** (`page.keyboard.type` + `Enter`) rather than role-based locators. The underlying Ant Design `Select` component does not expose its options through standard accessibility roles in a way Playwright can reliably wait on, so typing-to-filter combined with explicit waits was used as the more stable approach for this specific UI library.
 - **`deleteCategory()` assumes a "Food Menu" assignment** when cleaning up a non-empty category before deletion. This matches the data shape used by the tests in this suite; it is not a fully generic utility for categories with arbitrary menu assignments.
 - **The concurrent-session test (`TC_LOG_023`)** relies on a "Reload" conflict modal appearing when a second tab logs in — this is expected, intentional application behavior (blocking duplicate sessions), not a flaky wait condition.
+- **The GraphQL cleanup utility (`apiUtils.ts`) hardcodes the QA merchant ID and GraphQL endpoint URL** for this specific shared environment; it is not intended as a general-purpose utility for other merchants or environments.
 - Tests assume the QA environment and its seeded data (e.g. items "Miso soup", "Ebi tempura", "7 Up", "Mochi Cappuccino") remain available and unchanged. If the underlying test data is reset or renamed in the environment, the corresponding specs will need updating.
 
 ---
